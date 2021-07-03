@@ -1,1 +1,1 @@
-# othello-bitboard
+# reversi-bitboard
