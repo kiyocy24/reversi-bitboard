@@ -84,13 +84,13 @@ func (b *Board) LegalBoard() uint64 {
 	legalBoard |= blankBoard & (tmp << 1)
 
 	// 右
-	tmp = horizontalBoard & (playerBoard << 1)
-	tmp |= verticalBoard & (tmp << 1)
-	tmp |= verticalBoard & (tmp << 1)
-	tmp |= verticalBoard & (tmp << 1)
-	tmp |= verticalBoard & (tmp << 1)
-	tmp |= verticalBoard & (tmp << 1)
-	legalBoard |= blankBoard & (tmp << 1)
+	tmp = horizontalBoard & (playerBoard >> 1)
+	tmp |= verticalBoard & (tmp >> 1)
+	tmp |= verticalBoard & (tmp >> 1)
+	tmp |= verticalBoard & (tmp >> 1)
+	tmp |= verticalBoard & (tmp >> 1)
+	tmp |= verticalBoard & (tmp >> 1)
+	legalBoard |= blankBoard & (tmp >> 1)
 
 	// 左上
 	tmp = allSideBoard & (playerBoard << 9)

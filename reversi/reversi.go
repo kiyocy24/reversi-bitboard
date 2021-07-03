@@ -1,6 +1,7 @@
 package reversi
 
 import (
+	"fmt"
 	"github.com/kiyocy24/reversi-bitboard/reversi/board"
 	"github.com/kiyocy24/reversi-bitboard/reversi/helper"
 	"github.com/kiyocy24/reversi-bitboard/reversi/player"
@@ -35,16 +36,22 @@ func (r *Reversi) Player() string {
 	return ""
 }
 
-func (r *Reversi) GetBoard() string {
+func (r *Reversi) GetBoard() (s string) {
 	bb := r.getBoard()
 	legalBoard := r.getLegalBoard()
 
-	var s string
+	s = " |"
+	for i := 0; i < Length; i++ {
+		s += fmt.Sprintf("%c|", 'A'+i)
+	}
+	s += "\n"
+
 	for row := 0; row < Length; row++ {
+		s += fmt.Sprintf("%d", row+1)
 		for col := 0; col < Length; col++ {
 			s += "|"
-			b := bb[col][row]
-			isLegal := legalBoard[col][row]
+			b := bb[row][col]
+			isLegal := legalBoard[row][col]
 			if b.IsBlack() {
 				s += Black
 			} else if b.IsWhite() {

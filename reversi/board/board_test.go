@@ -290,6 +290,20 @@ func TestBoard_LegalBoard(t *testing.T) {
 				bi: D3 | C4 | F5 | E6,
 			},
 		},
+		{
+			name: "2手目",
+			fields: fields{
+				black:    E4 | D5 | E5 | F5,
+				white:    D4,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
+			},
+			wantErr: false,
+			want: want{
+				bi: F4 | D6 | F6,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

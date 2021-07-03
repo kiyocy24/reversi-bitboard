@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/kiyocy24/reversi-bitboard/reversi"
+	"github.com/kiyocy24/reversi-bitboard/reversi/helper"
 	"log"
 )
 
@@ -10,22 +11,23 @@ func main() {
 	log.Println("start")
 
 	r := reversi.NewReversi()
-	var row, col int
+	var input string
 	err := func() error {
 		for {
 			player := r.Player()
 			fmt.Println(r.GetBoard())
-			fmt.Printf("[%s] (col, row) > ", player)
-			_, err := fmt.Scan(&row, &col)
+			fmt.Printf("[%s] > ", player)
+			_, err := fmt.Scan(&input)
 			if err != nil {
 				return err
 			}
-			if row < 0 || reversi.Length <= row {
+
+			row, col, err := helper.StringToCoordinate(input)
+			if err != nil {
+				fmt.Println(err)
 				continue
 			}
-			if col < 0 || reversi.Length <= col {
-				continue
-			}
+			log.Println(row, col)
 
 			err = r.Reverse(row, col)
 			if err != nil {
