@@ -2,21 +2,22 @@ package board
 
 import (
 	"fmt"
-	"github.com/kiyocy24/reversi-bitboard/reversi/direction"
 	"log"
 	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/kiyocy24/reversi-bitboard/reversi/direction"
 	"github.com/kiyocy24/reversi-bitboard/reversi/player"
 )
 
 func TestBoard_Play(t *testing.T) {
 	type fields struct {
-		black  uint64
-		white  uint64
-		player player.Player
-		turn   int
+		black    uint64
+		white    uint64
+		player   player.Player
+		opposite player.Player
+		turn     int
 	}
 	type args struct {
 		p     player.Player
@@ -34,20 +35,22 @@ func TestBoard_Play(t *testing.T) {
 		{
 			name: "初手",
 			fields: fields{
-				black:  E4 | D5,
-				white:  D4 | E5,
-				player: player.Black,
-				turn:   1,
+				black:    E4 | D5,
+				white:    D4 | E5,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
 			},
 			args: args{
 				p:     player.Black,
 				input: C4,
 			},
 			want: &Board{
-				black:  C4 | D4 | E4 | D5,
-				white:  E5,
-				player: player.White,
-				turn:   2,
+				black:    C4 | D4 | E4 | D5,
+				white:    E5,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
 			},
 			wantErr: false,
 		},
@@ -83,10 +86,11 @@ func TestBoard_Play(t *testing.T) {
 
 func TestBoard_reverse(t *testing.T) {
 	type fields struct {
-		black  uint64
-		white  uint64
-		player player.Player
-		turn   int
+		black    uint64
+		white    uint64
+		player   player.Player
+		opposite player.Player
+		turn     int
 	}
 	type args struct {
 		put uint64
@@ -103,18 +107,20 @@ func TestBoard_reverse(t *testing.T) {
 		{
 			name: "3枚",
 			fields: fields{
-				black:  C5,
-				white:  D5,
-				player: player.Black,
-				turn:   1,
+				black:    C5,
+				white:    D5,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
 			},
 			args: args{put: E5},
 			want: want{
 				b: &Board{
-					black:  C5 | D5 | E5,
-					white:  0,
-					player: player.White,
-					turn:   2,
+					black:    C5 | D5 | E5,
+					white:    0,
+					player:   player.White,
+					opposite: player.Black,
+					turn:     2,
 				},
 			},
 		},
@@ -122,10 +128,11 @@ func TestBoard_reverse(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &Board{
-				black:  tt.fields.black,
-				white:  tt.fields.white,
-				player: tt.fields.player,
-				turn:   tt.fields.turn,
+				black:    tt.fields.black,
+				white:    tt.fields.white,
+				player:   tt.fields.player,
+				opposite: tt.fields.opposite,
+				turn:     tt.fields.turn,
 			}
 			b.reverse(tt.args.put)
 
@@ -135,8 +142,6 @@ func TestBoard_reverse(t *testing.T) {
 
 			if diff := cmp.Diff(tt.want.b, b, opts...); diff != "" {
 				t.Errorf("reverse() is mismatch (-want +got)%s\n", diff)
-				log.Printf("%b", tt.want.b.black)
-				log.Printf("%b", b.black)
 			}
 		})
 	}
