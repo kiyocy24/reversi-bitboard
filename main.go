@@ -2,29 +2,39 @@ package main
 
 import (
 	"fmt"
+	"github.com/kiyocy24/reversi-bitboard/reversi"
 	"log"
-
-	"github.com/kiyocy24/reversi-bitboard/reversi/board"
 )
 
 func main() {
 	log.Println("start")
 
-	b := board.NewBoard()
+	r := reversi.NewReversi()
 	var row, col int
-	for {
-		player := ""
-		if b.Player().IsBlack() {
-			player = "black"
-		} else if b.Player().IsWhite() {
-			player = "white"
-		}
-		fmt.Printf("[%s] (col, row) > ", player)
-		_, err := fmt.Scan(&row, &col)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
+	err := func() error {
+		for {
+			player := r.Player()
+			fmt.Println(r.GetBoard())
+			fmt.Printf("[%s] (col, row) > ", player)
+			_, err := fmt.Scan(&row, &col)
+			if err != nil {
+				return err
+			}
+			if row < 0 || reversi.Length <= row {
+				continue
+			}
+			if col < 0 || reversi.Length <= col {
+				continue
+			}
 
+			err = r.Reverse(row, col)
+			if err != nil {
+				return err
+			}
+		}
+	}()
+
+	if err != nil {
+		panic(err)
+	}
 }

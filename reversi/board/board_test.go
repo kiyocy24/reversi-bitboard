@@ -8,14 +8,13 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/kiyocy24/reversi-bitboard/reversi/bit"
 	"github.com/kiyocy24/reversi-bitboard/reversi/player"
 )
 
 func TestBoard_Play(t *testing.T) {
 	type fields struct {
-		black  *bit.Bit
-		white  *bit.Bit
+		black  uint64
+		white  uint64
 		player player.Player
 		turn   int
 	}
@@ -35,20 +34,20 @@ func TestBoard_Play(t *testing.T) {
 		{
 			name: "初手",
 			fields: fields{
-				black:  &bit.Bit{Value: E4 | D5},
-				white:  &bit.Bit{Value: D4 | E5},
+				black:  E4 | D5,
+				white:  D4 | E5,
 				player: player.Black,
-				turn:   0,
+				turn:   1,
 			},
 			args: args{
 				p:     player.Black,
 				input: C4,
 			},
 			want: &Board{
-				black:  &bit.Bit{Value: C4 | D4 | E4 | D5},
-				white:  &bit.Bit{Value: E5},
+				black:  C4 | D4 | E4 | D5,
+				white:  E5,
 				player: player.White,
-				turn:   1,
+				turn:   2,
 			},
 			wantErr: false,
 		},
@@ -84,8 +83,8 @@ func TestBoard_Play(t *testing.T) {
 
 func TestBoard_reverse(t *testing.T) {
 	type fields struct {
-		black  *bit.Bit
-		white  *bit.Bit
+		black  uint64
+		white  uint64
 		player player.Player
 		turn   int
 	}
@@ -104,18 +103,18 @@ func TestBoard_reverse(t *testing.T) {
 		{
 			name: "3枚",
 			fields: fields{
-				black:  &bit.Bit{Value: C5},
-				white:  &bit.Bit{Value: D5},
+				black:  C5,
+				white:  D5,
 				player: player.Black,
-				turn:   0,
+				turn:   1,
 			},
 			args: args{put: E5},
 			want: want{
 				b: &Board{
-					black:  &bit.Bit{Value: C5 | D5 | E5},
-					white:  &bit.Bit{Value: 0},
+					black:  C5 | D5 | E5,
+					white:  0,
 					player: player.White,
-					turn:   1,
+					turn:   2,
 				},
 			},
 		},
@@ -255,6 +254,58 @@ func Test_transfer(t *testing.T) {
 			got := transfer(tt.args.put, tt.args.d)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Errorf("reverse() is mismatch (-want +got)%s\n", diff)
+			}
+		})
+	}
+}
+
+func TestBoard_LegalBoard(t *testing.T) {
+	type fields struct {
+		black    uint64
+		white    uint64
+		player   player.Player
+		opposite player.Player
+		turn     int
+	}
+	type want struct {
+		bi uint64
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+		want    want
+	}{
+		{
+			name: "初手",
+			fields: fields{
+				black:    E4 | D5,
+				white:    D4 | E5,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
+			},
+			wantErr: false,
+			want: want{
+				bi: D3 | C4 | F5 | E6,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &Board{
+				black:    tt.fields.black,
+				white:    tt.fields.white,
+				player:   tt.fields.player,
+				opposite: tt.fields.opposite,
+				turn:     tt.fields.turn,
+			}
+			got := b.LegalBoard()
+			if diff := cmp.Diff(tt.want.bi, got); diff != "" {
+				t.Errorf("LegalBoard() is mismatch (-want +got)%s\n", diff)
+				log.Println("0123456789012345678901234567890123456789012345678901234567890123")
+				log.Printf("%064b", tt.want.bi)
+				log.Printf("%064b", got)
 			}
 		})
 	}

@@ -2,7 +2,6 @@ package board
 
 import (
 	"errors"
-	"github.com/kiyocy24/reversi-bitboard/reversi/bit"
 	"github.com/kiyocy24/reversi-bitboard/reversi/direction"
 	"github.com/kiyocy24/reversi-bitboard/reversi/player"
 )
@@ -13,18 +12,20 @@ const (
 )
 
 type Board struct {
-	black  *bit.Bit      // 黒番
-	white  *bit.Bit      // 白番
-	player player.Player // 手番
-	turn   int           // 手数
+	black    uint64        // 黒番
+	white    uint64        // 白番
+	player   player.Player // 手番
+	opposite player.Player // 待ち番
+	turn     int           // 手数
 }
 
 func NewBoard() *Board {
 	return &Board{
-		black:  bit.NewBit(),
-		white:  bit.NewBit(),
-		player: player.Black,
-		turn:   0,
+		black:    E4 | D5,
+		white:    D4 | E5,
+		player:   player.Black,
+		opposite: player.White,
+		turn:     1,
 	}
 }
 
@@ -49,66 +50,82 @@ func (b *Board) LegalBoard() uint64 {
 	oppositeBoard := *b.OppositeBoard()
 	horizontalBoard := oppositeBoard & 0x7e7e7e7e7e7e7e7e
 	verticalBoard := oppositeBoard & 0x00FFFFFFFFFFFF00
-	allSideBoard := oppositeBoard & horizontalBoard & verticalBoard
+	allSideBoard := oppositeBoard & 0x007e7e7e7e7e7e00
 	blankBoard := ^(playerBoard | oppositeBoard)
 
 	var tmp uint64
 	var legalBoard uint64
 
-	// 左上
-	tmp = allSideBoard & (playerBoard << 9)
-	for i := 0; i < Length-2; i++ {
-		tmp |= allSideBoard & (tmp << 9)
-	}
-	legalBoard = blankBoard & (tmp << 9)
-
 	// 上
-	tmp = horizontalBoard & (playerBoard << 8)
-	for i := 0; i < Length-2; i++ {
-		tmp |= horizontalBoard & (tmp << 8)
-	}
-	legalBoard |= blankBoard & (tmp << 8)
-
-	// 右上
-	tmp = allSideBoard & (playerBoard << 7)
-	for i := 0; i < Length-2; i++ {
-		tmp |= allSideBoard & (tmp << 7)
-	}
-	legalBoard |= blankBoard & (tmp << 7)
-
-	// 左
-	tmp = verticalBoard & (playerBoard << 1)
-	for i := 0; i < Length-2; i++ {
-		tmp |= verticalBoard & (tmp << 1)
-	}
-	legalBoard |= blankBoard & (tmp << 1)
-
-	// 右
-	tmp = verticalBoard & (playerBoard << 1)
-	for i := 0; i < Length-2; i++ {
-		tmp |= verticalBoard & (tmp << 1)
-	}
-	legalBoard |= blankBoard & (tmp << 1)
-
-	// 左下
-	tmp = allSideBoard & (playerBoard >> 7)
-	for i := 0; i < Length-2; i++ {
-		tmp |= allSideBoard & (tmp >> 7)
-	}
-	legalBoard = blankBoard & (tmp >> 7)
+	tmp = verticalBoard & (playerBoard << 8)
+	tmp |= verticalBoard & (tmp << 8)
+	tmp |= verticalBoard & (tmp << 8)
+	tmp |= verticalBoard & (tmp << 8)
+	tmp |= verticalBoard & (tmp << 8)
+	tmp |= verticalBoard & (tmp << 8)
+	legalBoard = blankBoard & (tmp << 8)
 
 	// 下
 	tmp = verticalBoard & (playerBoard >> 8)
-	for i := 0; i < Length-2; i++ {
-		tmp |= verticalBoard & (tmp >> 8)
-	}
+	tmp |= verticalBoard & (tmp >> 8)
+	tmp |= verticalBoard & (tmp >> 8)
+	tmp |= verticalBoard & (tmp >> 8)
+	tmp |= verticalBoard & (tmp >> 8)
+	tmp |= verticalBoard & (tmp >> 8)
 	legalBoard |= blankBoard & (tmp >> 8)
+
+	// 左
+	tmp = horizontalBoard & (playerBoard << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	legalBoard |= blankBoard & (tmp << 1)
+
+	// 右
+	tmp = horizontalBoard & (playerBoard << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	tmp |= verticalBoard & (tmp << 1)
+	legalBoard |= blankBoard & (tmp << 1)
+
+	// 左上
+	tmp = allSideBoard & (playerBoard << 9)
+	tmp |= allSideBoard & (tmp << 9)
+	tmp |= allSideBoard & (tmp << 9)
+	tmp |= allSideBoard & (tmp << 9)
+	tmp |= allSideBoard & (tmp << 9)
+	tmp |= allSideBoard & (tmp << 9)
+	legalBoard |= blankBoard & (tmp << 9)
+
+	// 右上
+	tmp = allSideBoard & (playerBoard << 7)
+	tmp |= allSideBoard & (tmp << 7)
+	tmp |= allSideBoard & (tmp << 7)
+	tmp |= allSideBoard & (tmp << 7)
+	tmp |= allSideBoard & (tmp << 7)
+	tmp |= allSideBoard & (tmp << 7)
+	legalBoard |= blankBoard & (tmp << 7)
+
+	// 左下
+	tmp = allSideBoard & (playerBoard >> 7)
+	tmp |= allSideBoard & (tmp >> 7)
+	tmp |= allSideBoard & (tmp >> 7)
+	tmp |= allSideBoard & (tmp >> 7)
+	tmp |= allSideBoard & (tmp >> 7)
+	tmp |= allSideBoard & (tmp >> 7)
+	legalBoard |= blankBoard & (tmp >> 7)
 
 	// 右下
 	tmp = allSideBoard & (playerBoard >> 9)
-	for i := 0; i < Length-2; i++ {
-		tmp |= allSideBoard & (tmp >> 9)
-	}
+	tmp |= allSideBoard & (tmp >> 9)
+	tmp |= allSideBoard & (tmp >> 9)
+	tmp |= allSideBoard & (tmp >> 9)
+	tmp |= allSideBoard & (tmp >> 9)
+	tmp |= allSideBoard & (tmp >> 9)
 	legalBoard |= blankBoard & (tmp >> 9)
 
 	return legalBoard
@@ -118,11 +135,15 @@ func (b *Board) Player() player.Player {
 	return b.player
 }
 
+func (b *Board) Opposite() player.Player {
+	return b.opposite
+}
+
 func (b *Board) PlayerBoard() *uint64 {
 	if b.player.IsBlack() {
-		return &b.black.Value
+		return &b.black
 	} else if b.player.IsWhite() {
-		return &b.white.Value
+		return &b.white
 	}
 
 	return nil
@@ -130,9 +151,9 @@ func (b *Board) PlayerBoard() *uint64 {
 
 func (b *Board) OppositeBoard() *uint64 {
 	if b.player.IsBlack() {
-		return &b.white.Value
+		return &b.white
 	} else if b.player.IsWhite() {
-		return &b.black.Value
+		return &b.black
 	}
 
 	return nil
@@ -187,22 +208,13 @@ func transfer(put uint64, d direction.Direction) uint64 {
 	return 0
 }
 
-func (b *Board) get(bi uint64) player.Player {
-	if (b.black.Get() & bi) != 0 {
-		return player.Black
-	}
-	if (b.white.Get() & bi) != 0 {
-		return player.White
-	}
-
-	return player.None
-}
-
 func (b *Board) next() {
 	if b.player.IsBlack() {
 		b.player = player.White
+		b.opposite = player.Black
 	} else if b.player.IsWhite() {
 		b.player = player.Black
+		b.opposite = player.White
 	}
 
 	b.turn++
