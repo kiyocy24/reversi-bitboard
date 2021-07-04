@@ -104,10 +104,9 @@ func (r *Reversi) getLegalBoard() [Length][Length]bool {
 	bb := [Length][Length]bool{}
 	legalBoard := r.b.LegalBoard()
 
-	bi := uint64(0)
 	for i := 0; i < AreaSize; i++ {
-		bi = bi << i
-		row, col := helper.BitToCoordinate(bi)
+		bi := uint64(1 << i)
+		row, col := helper.BitToCoordinate(1 << i)
 		bb[row][col] = legalBoard&bi != 0
 	}
 

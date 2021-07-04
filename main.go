@@ -27,7 +27,6 @@ func main() {
 				fmt.Println(err)
 				continue
 			}
-			log.Println(row, col)
 
 			err = r.Reverse(row, col)
 			if err != nil {

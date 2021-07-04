@@ -54,6 +54,182 @@ func TestBoard_Play(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "上",
+			fields: fields{
+				black:    D5,
+				white:    D4,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
+			},
+			args: args{
+				p:     player.Black,
+				input: D3,
+			},
+			want: &Board{
+				black:    D3 | D4 | D5,
+				white:    0,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
+			},
+			wantErr: false,
+		},
+		{
+			name: "右上",
+			fields: fields{
+				black:    D5,
+				white:    E4,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
+			},
+			args: args{
+				p:     player.Black,
+				input: F3,
+			},
+			want: &Board{
+				black:    F3 | E4 | D5,
+				white:    0,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
+			},
+			wantErr: false,
+		},
+		{
+			name: "右",
+			fields: fields{
+				black:    D5,
+				white:    E5,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
+			},
+			args: args{
+				p:     player.Black,
+				input: F5,
+			},
+			want: &Board{
+				black:    D5 | E5 | F5,
+				white:    0,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
+			},
+			wantErr: false,
+		},
+		{
+			name: "右下",
+			fields: fields{
+				black:    D5,
+				white:    E6,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
+			},
+			args: args{
+				p:     player.Black,
+				input: F7,
+			},
+			want: &Board{
+				black:    D5 | E6 | F7,
+				white:    0,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
+			},
+			wantErr: false,
+		},
+		{
+			name: "下",
+			fields: fields{
+				black:    D5,
+				white:    D6,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
+			},
+			args: args{
+				p:     player.Black,
+				input: D7,
+			},
+			want: &Board{
+				black:    D5 | D6 | D7,
+				white:    0,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
+			},
+			wantErr: false,
+		},
+		{
+			name: "左下",
+			fields: fields{
+				black:    D5,
+				white:    C6,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
+			},
+			args: args{
+				p:     player.Black,
+				input: B7,
+			},
+			want: &Board{
+				black:    D5 | C6 | B7,
+				white:    0,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
+			},
+			wantErr: false,
+		},
+		{
+			name: "左",
+			fields: fields{
+				black:    D5,
+				white:    C5,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
+			},
+			args: args{
+				p:     player.Black,
+				input: B5,
+			},
+			want: &Board{
+				black:    D5 | C5 | B5,
+				white:    0,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
+			},
+			wantErr: false,
+		},
+		{
+			name: "左上",
+			fields: fields{
+				black:    D5,
+				white:    C4,
+				player:   player.Black,
+				opposite: player.White,
+				turn:     1,
+			},
+			args: args{
+				p:     player.Black,
+				input: B3,
+			},
+			want: &Board{
+				black:    D5 | C4 | B3,
+				white:    0,
+				player:   player.White,
+				opposite: player.Black,
+				turn:     2,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
