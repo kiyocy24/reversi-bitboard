@@ -18,10 +18,13 @@ jobs:
     - name: Cache
       uses: actions/cache@v2.1.6
       with:
-        path: ~/go/pkg/mod
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
+          - uses: actions/cache@v2
           
   build:
     needs: setup
